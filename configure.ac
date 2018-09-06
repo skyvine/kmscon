@@ -74,7 +74,7 @@ AC_SUBST(DRM_LIBS)
 # ourself.
 #
 
-PKG_CHECK_MODULES([SYSTEMD], [libsystemd-daemon libsystemd-login],
+PKG_CHECK_MODULES([SYSTEMD], [libsystemd],
                   [have_systemd=yes], [have_systemd=no])
 AC_SUBST(SYSTEMD_CFLAGS)
 AC_SUBST(SYSTEMD_LIBS)
