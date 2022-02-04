@@ -40,8 +40,8 @@
 
 #define LLOG_SUBSYSTEM "uterm_uxkb"
 
-extern const char _binary_src_uterm_input_fallback_xkb_bin_start[];
-extern const char _binary_src_uterm_input_fallback_xkb_bin_end[];
+extern const char *_binary_src_uterm_input_fallback_xkb_bin_start;
+extern const char *_binary_src_uterm_input_fallback_xkb_bin_end;
 
 static void uxkb_log(struct xkb_context *context, enum xkb_log_level level,
 		     const char *format, va_list args)

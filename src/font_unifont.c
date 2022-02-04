@@ -62,8 +62,8 @@ struct unifont_data {
 	uint8_t data[32];
 } __attribute__((__packed__));
 
-extern const char _binary_src_font_unifont_data_bin_start[];
-extern const char _binary_src_font_unifont_data_bin_end[];
+extern const char *_binary_src_font_unifont_data_bin_start;
+extern const char *_binary_src_font_unifont_data_bin_end;
 
 /*
  * Global glyph cache

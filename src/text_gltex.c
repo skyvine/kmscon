@@ -141,10 +141,10 @@ static void free_glyph(void *data)
 	free(glyph);
 }
 
-extern const char _binary_src_text_gltex_atlas_vert_bin_start[];
-extern const char _binary_src_text_gltex_atlas_vert_bin_end[];
-extern const char _binary_src_text_gltex_atlas_frag_bin_start[];
-extern const char _binary_src_text_gltex_atlas_frag_bin_end[];
+extern const char *_binary_src_text_gltex_atlas_vert_bin_start;
+extern const char *_binary_src_text_gltex_atlas_vert_bin_end;
+extern const char *_binary_src_text_gltex_atlas_frag_bin_start;
+extern const char *_binary_src_text_gltex_atlas_frag_bin_end;
 
 static int gltex_set(struct kmscon_text *txt)
 {

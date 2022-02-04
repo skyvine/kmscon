@@ -54,18 +54,18 @@
 
 #define LOG_SUBSYSTEM "uterm_drm3d_render"
 
-extern const char _binary_src_uterm_drm3d_blend_vert_bin_start[];
-extern const char _binary_src_uterm_drm3d_blend_vert_bin_end[];
-extern const char _binary_src_uterm_drm3d_blend_frag_bin_start[];
-extern const char _binary_src_uterm_drm3d_blend_frag_bin_end[];
-extern const char _binary_src_uterm_drm3d_blit_vert_bin_start[];
-extern const char _binary_src_uterm_drm3d_blit_vert_bin_end[];
-extern const char _binary_src_uterm_drm3d_blit_frag_bin_start[];
-extern const char _binary_src_uterm_drm3d_blit_frag_bin_end[];
-extern const char _binary_src_uterm_drm3d_fill_vert_bin_start[];
-extern const char _binary_src_uterm_drm3d_fill_vert_bin_end[];
-extern const char _binary_src_uterm_drm3d_fill_frag_bin_start[];
-extern const char _binary_src_uterm_drm3d_fill_frag_bin_end[];
+extern const char *_binary_src_uterm_drm3d_blend_vert_bin_start;
+extern const char *_binary_src_uterm_drm3d_blend_vert_bin_end;
+extern const char *_binary_src_uterm_drm3d_blend_frag_bin_start;
+extern const char *_binary_src_uterm_drm3d_blend_frag_bin_end;
+extern const char *_binary_src_uterm_drm3d_blit_vert_bin_start;
+extern const char *_binary_src_uterm_drm3d_blit_vert_bin_end;
+extern const char *_binary_src_uterm_drm3d_blit_frag_bin_start;
+extern const char *_binary_src_uterm_drm3d_blit_frag_bin_end;
+extern const char *_binary_src_uterm_drm3d_fill_vert_bin_start;
+extern const char *_binary_src_uterm_drm3d_fill_vert_bin_end;
+extern const char *_binary_src_uterm_drm3d_fill_frag_bin_start;
+extern const char *_binary_src_uterm_drm3d_fill_frag_bin_end;
 
 static int init_shaders(struct uterm_video *video)
 {
