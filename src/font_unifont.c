@@ -62,8 +62,9 @@ struct unifont_data {
 	uint8_t data[32];
 } __attribute__((__packed__));
 
-extern const char _binary_src_font_unifont_data_bin_start[];
-extern const char _binary_src_font_unifont_data_bin_end[];
+extern const char *_binary_src_font_unifont_data_bin_start;
+extern const char *_binary_src_font_unifont_data_bin_end;
+extern const size_t _binary_src_font_unifont_data_bin_size;
 
 /*
  * Global glyph cache
@@ -209,13 +210,10 @@ static int kmscon_font_unifont_init(struct kmscon_font *out,
 				    const struct kmscon_font_attr *attr)
 {
 	static const char name[] = "static-unifont";
-	const struct unifont_data *start, *end;
 
 	log_debug("loading static unifont font");
 
-	start = (const struct unifont_data*)_binary_src_font_unifont_data_bin_start;
-	end = (const struct unifont_data*)_binary_src_font_unifont_data_bin_end;
-	if (start == end) {
+	if (_binary_src_font_unifont_data_bin_size == 0) {
 		log_error("unifont glyph information not found in binary");
 		return -EFAULT;
 	}

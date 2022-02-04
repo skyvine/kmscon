@@ -141,10 +141,12 @@ static void free_glyph(void *data)
 	free(glyph);
 }
 
-extern const char _binary_src_text_gltex_atlas_vert_bin_start[];
-extern const char _binary_src_text_gltex_atlas_vert_bin_end[];
-extern const char _binary_src_text_gltex_atlas_frag_bin_start[];
-extern const char _binary_src_text_gltex_atlas_frag_bin_end[];
+extern const char *_binary_src_text_gltex_atlas_vert_bin_start;
+extern const char *_binary_src_text_gltex_atlas_vert_bin_end;
+extern const size_t _binary_src_text_gltex_atlas_vert_bin_size;
+extern const char *_binary_src_text_gltex_atlas_frag_bin_start;
+extern const char *_binary_src_text_gltex_atlas_frag_bin_end;
+extern const size_t _binary_src_text_gltex_atlas_frag_bin_size;
 
 static int gltex_set(struct kmscon_text *txt)
 {
@@ -179,9 +181,9 @@ static int gltex_set(struct kmscon_text *txt)
 	}
 
 	vert = _binary_src_text_gltex_atlas_vert_bin_start;
-	vlen = _binary_src_text_gltex_atlas_vert_bin_end - vert;
+	vlen = _binary_src_text_gltex_atlas_vert_bin_size;
 	frag = _binary_src_text_gltex_atlas_frag_bin_start;
-	flen = _binary_src_text_gltex_atlas_frag_bin_end - frag;
+	flen = _binary_src_text_gltex_atlas_frag_bin_size;
 	gl_clear_error();
 
 	ret = gl_shader_new(&gt->shader, vert, vlen, frag, flen, attr, 4,
