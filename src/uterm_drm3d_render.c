@@ -56,16 +56,22 @@
 
 extern const char *_binary_src_uterm_drm3d_blend_vert_bin_start;
 extern const char *_binary_src_uterm_drm3d_blend_vert_bin_end;
+extern const size_t _binary_src_uterm_drm3d_blend_vert_bin_size;
 extern const char *_binary_src_uterm_drm3d_blend_frag_bin_start;
 extern const char *_binary_src_uterm_drm3d_blend_frag_bin_end;
+extern const size_t _binary_src_uterm_drm3d_blend_frag_bin_size;
 extern const char *_binary_src_uterm_drm3d_blit_vert_bin_start;
 extern const char *_binary_src_uterm_drm3d_blit_vert_bin_end;
+extern const size_t _binary_src_uterm_drm3d_blit_vert_bin_size;
 extern const char *_binary_src_uterm_drm3d_blit_frag_bin_start;
 extern const char *_binary_src_uterm_drm3d_blit_frag_bin_end;
+extern const size_t _binary_src_uterm_drm3d_blit_frag_bin_size;
 extern const char *_binary_src_uterm_drm3d_fill_vert_bin_start;
 extern const char *_binary_src_uterm_drm3d_fill_vert_bin_end;
+extern const size_t _binary_src_uterm_drm3d_fill_vert_bin_size;
 extern const char *_binary_src_uterm_drm3d_fill_frag_bin_start;
 extern const char *_binary_src_uterm_drm3d_fill_frag_bin_end;
+extern const size_t _binary_src_uterm_drm3d_fill_frag_bin_size;
 
 static int init_shaders(struct uterm_video *video)
 {

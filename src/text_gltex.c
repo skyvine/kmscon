@@ -143,8 +143,10 @@ static void free_glyph(void *data)
 
 extern const char *_binary_src_text_gltex_atlas_vert_bin_start;
 extern const char *_binary_src_text_gltex_atlas_vert_bin_end;
+extern const size_t _binary_src_text_gltex_atlas_vert_bin_size;
 extern const char *_binary_src_text_gltex_atlas_frag_bin_start;
 extern const char *_binary_src_text_gltex_atlas_frag_bin_end;
+extern const size_t _binary_src_text_gltex_atlas_frag_bin_size;
 
 static int gltex_set(struct kmscon_text *txt)
 {

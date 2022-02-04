@@ -64,6 +64,7 @@ struct unifont_data {
 
 extern const char *_binary_src_font_unifont_data_bin_start;
 extern const char *_binary_src_font_unifont_data_bin_end;
+extern const size_t _binary_src_font_unifont_data_bin_size;
 
 /*
  * Global glyph cache
