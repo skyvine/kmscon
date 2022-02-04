@@ -131,8 +131,7 @@ static int get_glyph(struct face *face, struct kmscon_glyph **out,
 		return -ERANGE;
 
 	pthread_mutex_lock(&face->glyph_lock);
-	res = shl_hashtable_find(face->glyphs, (void**)&glyph,
-				 (void*)(uint64_t)id);
+	res = shl_hashtable_find(face->glyphs, (void**)&glyph, id);
 	pthread_mutex_unlock(&face->glyph_lock);
 	if (res) {
 		*out = glyph;
@@ -227,7 +226,7 @@ static int get_glyph(struct face *face, struct kmscon_glyph **out,
 	pango_ft2_render_layout_line(&bitmap, line, -rec.x, face->baseline);
 
 	pthread_mutex_lock(&face->glyph_lock);
-	ret = shl_hashtable_insert(face->glyphs, (void*)(uint64_t)id, glyph);
+	ret = shl_hashtable_insert(face->glyphs, id, glyph);
 	pthread_mutex_unlock(&face->glyph_lock);
 	if (ret) {
 		log_error("cannot add glyph to hashtable");
@@ -299,7 +298,7 @@ static int manager_get_face(struct face **out, struct kmscon_font_attr *attr)
 	}
 
 	ret = shl_hashtable_new(&face->glyphs, shl_direct_hash,
-				shl_direct_equal, NULL, free_glyph);
+				shl_direct_equal, free_glyph);
 	if (ret) {
 		log_error("cannot allocate hashtable");
 		goto err_lock;
