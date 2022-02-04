@@ -185,14 +185,12 @@ static int tp_set(struct kmscon_text *txt)
 	}
 
 	ret = shl_hashtable_new(&tp->glyphs, shl_direct_hash,
-				shl_direct_equal, NULL,
-				free_glyph);
+				shl_direct_equal, free_glyph);
 	if (ret)
 		goto err_white;
 
 	ret = shl_hashtable_new(&tp->bold_glyphs, shl_direct_hash,
-				shl_direct_equal, NULL,
-				free_glyph);
+				shl_direct_equal, free_glyph);
 	if (ret)
 		goto err_htable;
 
@@ -292,8 +290,7 @@ static int find_glyph(struct kmscon_text *txt, struct tp_glyph **out,
 	else
 		font->attr.italic = false;
 
-	res = shl_hashtable_find(gtable, (void**)&glyph,
-				 (void*)(uint64_t)id);
+	res = shl_hashtable_find(gtable, (void**)&glyph, id);
 	if (res) {
 		*out = glyph;
 		return 0;
@@ -361,7 +358,7 @@ static int find_glyph(struct kmscon_text *txt, struct tp_glyph **out,
 		goto err_free;
 	}
 
-	ret = shl_hashtable_insert(gtable, (void*)(uint64_t)id, glyph);
+	ret = shl_hashtable_insert(gtable, id, glyph);
 	if (ret)
 		goto err_pixman;
 

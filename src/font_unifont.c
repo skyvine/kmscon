@@ -118,14 +118,13 @@ static int find_glyph(uint32_t ch, const struct kmscon_glyph **out)
 
 	if (!cache) {
 		ret = shl_hashtable_new(&cache, shl_direct_hash,
-					shl_direct_equal, NULL, free_glyph);
+					shl_direct_equal, free_glyph);
 		if (ret) {
 			log_error("cannot create unifont hashtable: %d", ret);
 			goto out_unlock;
 		}
 	} else {
-		res = shl_hashtable_find(cache, (void**)out,
-					 (void*)(uint64_t)ch);
+		res = shl_hashtable_find(cache, (void**)out, ch);
 		if (res) {
 			ret = 0;
 			goto out_unlock;
@@ -187,7 +186,7 @@ static int find_glyph(uint32_t ch, const struct kmscon_glyph **out)
 		unfold(&g->buf.data[i * 8 + 7], d->data[i] & 0x01);
 	}
 
-	ret = shl_hashtable_insert(cache, (void*)(uint64_t)ch, g);
+	ret = shl_hashtable_insert(cache, ch, g);
 	if (ret) {
 		log_error("cannot insert glyph into glyph-cache: %d", ret);
 		goto err_data;

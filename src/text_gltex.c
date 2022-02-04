@@ -162,14 +162,12 @@ static int gltex_set(struct kmscon_text *txt)
 	shl_dlist_init(&gt->atlases);
 
 	ret = shl_hashtable_new(&gt->glyphs, shl_direct_hash,
-				shl_direct_equal, NULL,
-				free_glyph);
+				shl_direct_equal, free_glyph);
 	if (ret)
 		return ret;
 
 	ret = shl_hashtable_new(&gt->bold_glyphs, shl_direct_hash,
-				shl_direct_equal, NULL,
-				free_glyph);
+				shl_direct_equal, free_glyph);
 	if (ret)
 		goto err_htable;
 
@@ -411,8 +409,7 @@ static int find_glyph(struct kmscon_text *txt, struct glyph **out,
 	else
 		font->attr.italic = false;
 
-	res = shl_hashtable_find(gtable, (void**)&glyph,
-				 (void*)(uint64_t)id);
+	res = shl_hashtable_find(gtable, (void**)&glyph, id);
 	if (res) {
 		*out = glyph;
 		return 0;
@@ -515,7 +512,7 @@ static int find_glyph(struct kmscon_text *txt, struct glyph **out,
 	glyph->atlas = atlas;
 	glyph->texoff = atlas->fill;
 
-	ret = shl_hashtable_insert(gtable, (void*)(uint64_t)id, glyph);
+	ret = shl_hashtable_insert(gtable, id, glyph);
 	if (ret)
 		goto err_free;
 
