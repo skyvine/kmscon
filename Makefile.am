@@ -374,7 +374,11 @@ mod_unifont_la_SOURCES = \
 	src/font_unifont.c \
 	src/kmscon_mod_unifont.c \
 	src/font_unifont_data.bin.c
+mod_unifont_la_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	$(TSM_CFLAGS)
 mod_unifont_la_LIBADD = \
+	$(TSM_LIBS) \
 	libshl.la
 mod_unifont_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
