@@ -76,6 +76,7 @@ struct uterm_input {
 	struct shl_hook *hook;
 	struct xkb_context *ctx;
 	struct xkb_keymap *keymap;
+	struct xkb_compose_table *compose_table;
 
 	struct shl_dlist devices;
 };
@@ -90,6 +91,7 @@ int uxkb_desc_init(struct uterm_input *input,
 		   const char *layout,
 		   const char *variant,
 		   const char *options,
+		   const char *locale,
 		   const char *keymap);
 void uxkb_desc_destroy(struct uterm_input *input);
 

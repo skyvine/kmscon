@@ -225,6 +225,7 @@ int uterm_input_new(struct uterm_input **out,
 		    const char *layout,
 		    const char *variant,
 		    const char *options,
+		    const char *locale,
 		    const char *keymap,
 		    unsigned int repeat_delay,
 		    unsigned int repeat_rate,
@@ -262,7 +263,8 @@ int uterm_input_new(struct uterm_input **out,
 	if (ret)
 		goto err_free;
 
-	ret = uxkb_desc_init(input, model, layout, variant, options, keymap);
+	ret = uxkb_desc_init(input, model, layout, variant, options, locale,
+			     keymap);
 	if (ret)
 		goto err_hook;
 

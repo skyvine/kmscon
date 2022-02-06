@@ -52,6 +52,7 @@ struct {
 	char *xkb_layout;
 	char *xkb_variant;
 	char *xkb_options;
+	char *locale;
 	char *xkb_keymap;
 } input_conf;
 
@@ -130,6 +131,7 @@ static void monitor_event(struct uterm_monitor *mon,
 				      input_conf.xkb_layout,
 				      input_conf.xkb_variant,
 				      input_conf.xkb_options,
+				      input_conf.locale,
 				      keymap,
 				      0, 0, log_llog, NULL);
 		if (ret)
@@ -179,6 +181,7 @@ static void print_help()
 		"\t    --xkb-layout <layout>   [-]     Set XkbLayout for input devices\n"
 		"\t    --xkb-variant <variant> [-]     Set XkbVariant for input devices\n"
 		"\t    --xkb-options <options> [-]     Set XkbOptions for input devices\n"
+		"\t    --locale <locale>       [-]     Set locale for input devices\n"
 		"\t    --xkb-keymap <FILE>     [-]     Use a predefined keymap for\n"
 		"\t                                    input devices\n",
 		"test_input");
@@ -198,6 +201,7 @@ struct conf_option options[] = {
 	CONF_OPTION_STRING(0, "xkb-layout", &input_conf.xkb_layout, ""),
 	CONF_OPTION_STRING(0, "xkb-variant", &input_conf.xkb_variant, ""),
 	CONF_OPTION_STRING(0, "xkb-options", &input_conf.xkb_options, ""),
+	CONF_OPTION_STRING(0, "locale", &input_conf.locale, "C"),
 	CONF_OPTION_STRING(0, "xkb-keymap", &input_conf.xkb_keymap, ""),
 };
 

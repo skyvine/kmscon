@@ -32,6 +32,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <xkbcommon/xkbcommon.h>
+#include <xkbcommon/xkbcommon-compose.h>
 #include "shl_hook.h"
 #include "shl_llog.h"
 #include "shl_misc.h"
@@ -86,6 +87,7 @@ int uxkb_desc_init(struct uterm_input *input,
 		   const char *layout,
 		   const char *variant,
 		   const char *options,
+		   const char *locale,
 		   const char *keymap)
 {
 	int ret;
@@ -119,13 +121,15 @@ int uxkb_desc_init(struct uterm_input *input,
 		if (input->keymap) {
 			llog_debug(input,
 				   "new keyboard description from memory");
-			return 0;
+		} else {
+			llog_warn(input, "cannot parse keymap, reverting to rmlvo");
 		}
-
-		llog_warn(input, "cannot parse keymap, reverting to rmlvo");
 	}
 
-	input->keymap = xkb_keymap_new_from_names(input->ctx, &rmlvo, 0);
+	if (!input->keymap) {
+		input->keymap = xkb_keymap_new_from_names(input->ctx, &rmlvo, 0);
+	}
+
 	if (!input->keymap) {
 		llog_warn(input, "failed to create keymap (%s, %s, %s, %s), "
 			  "reverting to default system keymap",
@@ -158,6 +162,17 @@ int uxkb_desc_init(struct uterm_input *input,
 			   model, layout, variant, options);
 	}
 
+	if (!input->compose_table) {
+		input->compose_table = xkb_compose_table_new_from_locale(
+								input->ctx,
+								locale,
+								0);
+		if (!input->compose_table) {
+			llog_warn(input, "failed to create XKB default compose "
+				  "table, disabling compose support");
+		}
+	}
+
 	return 0;
 
 err_ctx:
@@ -167,6 +182,7 @@ err_ctx:
 
 void uxkb_desc_destroy(struct uterm_input *input)
 {
+	xkb_compose_table_unref(input->compose_table);
 	xkb_keymap_unref(input->keymap);
 	xkb_context_unref(input->ctx);
 }
