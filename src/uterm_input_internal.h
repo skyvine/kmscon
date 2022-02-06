@@ -53,6 +53,7 @@ struct uterm_input_dev {
 	char *node;
 	struct ev_fd *fd;
 	struct xkb_state *state;
+	struct xkb_compose_state *compose_state;
 	/* Used in sleep/wake up to store the key's pressed/released state. */
 	char key_state_bits[SHL_DIV_ROUND_UP(KEY_CNT, CHAR_BIT)];
 

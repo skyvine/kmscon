@@ -231,6 +231,15 @@ int uxkb_dev_init(struct uterm_input_dev *dev)
 		goto err_timer;
 	}
 
+	if (dev->input->compose_table) {
+		dev->compose_state = xkb_compose_state_new(
+						dev->input->compose_table,
+						0);
+		if (!dev->compose_state)
+			llog_warn(dev->input, "cannot create compose state, "
+				  "disabling compose support");
+	}
+
 	return 0;
 
 err_timer:
@@ -240,6 +249,7 @@ err_timer:
 
 void uxkb_dev_destroy(struct uterm_input_dev *dev)
 {
+	xkb_compose_state_unref(dev->compose_state);
 	xkb_state_unref(dev->state);
 	ev_eloop_rm_timer(dev->repeat_timer);
 }
@@ -416,18 +426,87 @@ int uxkb_dev_process(struct uterm_input_dev *dev,
 		     uint16_t key_state, uint16_t code)
 {
 	struct xkb_state *state;
+	struct xkb_compose_state *compose_state;
 	xkb_keycode_t keycode;
 	const xkb_keysym_t *keysyms;
+	xkb_keysym_t one_sym;
 	int num_keysyms, ret;
+	enum xkb_compose_status compose_status;
 	enum xkb_state_component changed;
 
 	if (key_state == KEY_REPEATED)
 		return -ENOKEY;
 
 	state = dev->state;
+	compose_state = dev->compose_state;
 	keycode = code + EVDEV_KEYCODE_OFFSET;
 
+	/*
+	 * To summarize the following convoluted logic:
+	 *
+	 * - single key press may produce one or more keysyms
+	 * - if num_keysyms == 1,
+	 *     + use get_one_sym to handle the maybe present LOCK mod
+	 *     + use the resulting one_sym to feed the compose_state
+	 *     + if the keysym completes a compose sequence,
+	 *         * compose_state will either produce one keysym, which is set
+	 *           back to one_sym, or
+	 *         * compose_state will produce NoSymbol, which is treated as a
+	 *           cancelled compose sequence
+	 *     + if the keysym completes or cancels a sequence, reset
+	 *       compose_state
+	 * - if num_keysyms != 1,
+	 *     + LOCK mod translation doesn't make sense, so skip that
+	 *     + compose_state is fed NoSymbol per documentation and the result
+	 *       is basically ignored
+	 * - update xkb state after querying keysyms per documentation
+	 * - if in the process of composing or if the composing was cancelled by
+	 *   the key press, stop here
+	 * - otherwise process events with keysyms and num_keysyms
+	 *
+	 * Some background on compose handling:
+	 * - https://github.com/xkbcommon/libxkbcommon/issues/4
+	 */
+
 	num_keysyms = xkb_state_key_get_syms(state, keycode, &keysyms);
+
+	one_sym = XKB_KEY_NoSymbol;
+	if (num_keysyms == 1) {
+		/* See: https://bugs.freedesktop.org/show_bug.cgi?id=67167 */
+		one_sym = xkb_state_key_get_one_sym(state, keycode);
+		keysyms = &one_sym;
+	}
+
+	compose_status = XKB_COMPOSE_NOTHING;
+	if (compose_state && key_state == KEY_PRESSED) {
+		/* XKB_KEY_NoSymbol cancels the current compose sequence. */
+		xkb_compose_state_feed(compose_state, one_sym);
+
+		compose_status = xkb_compose_state_get_status(compose_state);
+
+		if (compose_status == XKB_COMPOSE_COMPOSED) {
+			one_sym = xkb_compose_state_get_one_sym(compose_state);
+			if (one_sym == XKB_KEY_NoSymbol) {
+				/*
+				 * It is possible that the sequence only
+				 * specifies an utf8 string and not a keysym.
+				 * Treat this is cancelled, as the rest of the
+				 * system can not handle it.
+				 */
+				compose_status = XKB_COMPOSE_CANCELLED;
+			}
+		}
+
+		/*
+		 * Modifiers are legal key presses, but do not change the
+		 * compose_state. If the state is not reset after a sequence is
+		 * completed, holding down a modifier after composing repeats
+		 * the last composed sequence.
+		 */
+		if (compose_status == XKB_COMPOSE_COMPOSED ||
+		    compose_status == XKB_COMPOSE_CANCELLED)
+			xkb_compose_state_reset(compose_state);
+	}
 
 	changed = 0;
 	if (key_state == KEY_PRESSED)
@@ -439,6 +518,10 @@ int uxkb_dev_process(struct uterm_input_dev *dev,
 		uxkb_dev_update_keyboard_leds(dev);
 
 	if (num_keysyms <= 0)
+		return -ENOKEY;
+
+	if (compose_status == XKB_COMPOSE_COMPOSING ||
+	    compose_status == XKB_COMPOSE_CANCELLED)
 		return -ENOKEY;
 
 	ret = uxkb_dev_fill_event(dev, &dev->event, keycode, num_keysyms,
@@ -513,4 +596,7 @@ void uxkb_dev_wake_up(struct uterm_input_dev *dev)
 	}
 
 	uxkb_dev_update_keyboard_leds(dev);
+
+	if (dev->compose_state)
+		xkb_compose_state_reset(dev->compose_state);
 }
