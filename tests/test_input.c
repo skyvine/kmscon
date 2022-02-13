@@ -54,6 +54,7 @@ struct {
 	char *xkb_options;
 	char *locale;
 	char *xkb_keymap;
+	char *xkb_compose_file;
 } input_conf;
 
 /* Pressing Ctrl-\ should toggle the capturing. */
@@ -111,7 +112,8 @@ static void monitor_event(struct uterm_monitor *mon,
 				void *data)
 {
 	int ret;
-	char *keymap;
+	char *keymap, *compose_file;
+	size_t compose_file_len;
 
 	if (ev->type == UTERM_MONITOR_NEW_SEAT) {
 		if (strcmp(ev->seat_name, "seat0"))
@@ -126,13 +128,24 @@ static void monitor_event(struct uterm_monitor *mon,
 					  input_conf.xkb_keymap, ret);
 		}
 
+		compose_file = NULL;
+		compose_file_len = 0;
+		if (input_conf.xkb_compose_file &&
+		    *input_conf.xkb_compose_file) {
+			ret = shl_read_file(input_conf.xkb_compose_file,
+					    &compose_file, &compose_file_len);
+			if (ret)
+				log_error("cannot read compose file %s: %d",
+					  input_conf.xkb_compose_file, ret);
+		}
+
 		ret = uterm_input_new(&input, eloop,
 				      input_conf.xkb_model,
 				      input_conf.xkb_layout,
 				      input_conf.xkb_variant,
 				      input_conf.xkb_options,
 				      input_conf.locale,
-				      keymap,
+				      keymap, compose_file, compose_file_len,
 				      0, 0, log_llog, NULL);
 		if (ret)
 			return;
@@ -203,6 +216,7 @@ struct conf_option options[] = {
 	CONF_OPTION_STRING(0, "xkb-options", &input_conf.xkb_options, ""),
 	CONF_OPTION_STRING(0, "locale", &input_conf.locale, "C"),
 	CONF_OPTION_STRING(0, "xkb-keymap", &input_conf.xkb_keymap, ""),
+	CONF_OPTION_STRING(0, "xkb-compose-file", &input_conf.xkb_compose_file, ""),
 };
 
 int main(int argc, char **argv)

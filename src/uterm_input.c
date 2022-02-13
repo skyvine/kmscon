@@ -227,6 +227,8 @@ int uterm_input_new(struct uterm_input **out,
 		    const char *options,
 		    const char *locale,
 		    const char *keymap,
+		    const char *compose_file,
+		    size_t compose_file_len,
 		    unsigned int repeat_delay,
 		    unsigned int repeat_rate,
 		    uterm_input_log_t log,
@@ -264,7 +266,7 @@ int uterm_input_new(struct uterm_input **out,
 		goto err_free;
 
 	ret = uxkb_desc_init(input, model, layout, variant, options, locale,
-			     keymap);
+			     keymap, compose_file, compose_file_len);
 	if (ret)
 		goto err_hook;
 

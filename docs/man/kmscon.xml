@@ -290,6 +290,23 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>--xkb-compose-file {file}</option></term>
+        <listitem>
+          <para>Path to a single predefined compose file. An empty path "" is
+                interpreted as using the default compose file. The default
+                compose file search order is described in
+                <citerefentry><refentrytitle>Compose</refentrytitle><manvolnum>5</manvolnum></citerefentry>.
+                The locale is determined from the first of
+                <envar>LC_ALL</envar>, <envar>LC_CTYPE</envar>, or
+                <envar>LANG</envar> that's set to a non-empty value. If the
+                locale cannot be determined, <literal>C</literal> is assumed. If
+                no compose file is found, composing is disabled. (default:
+                search the compose file corresponding to the current
+                locale)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
         <term><option>--xkb-repeat-delay {delay}</option></term>
         <listitem>
           <para>Delay after key was pressed until key-repeat starts (in
@@ -620,7 +637,8 @@
     <title>See Also</title>
     <para>
       <citerefentry><refentrytitle>kmscon.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
-      <citerefentry><refentrytitle>console</refentrytitle><manvolnum>4</manvolnum></citerefentry>
+      <citerefentry><refentrytitle>console</refentrytitle><manvolnum>4</manvolnum></citerefentry>,
+      <citerefentry><refentrytitle>Compose</refentrytitle><manvolnum>5</manvolnum></citerefentry>
     </para>
   </refsect1>
 </refentry>

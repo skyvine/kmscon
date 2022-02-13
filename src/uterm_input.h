@@ -81,6 +81,7 @@ typedef void (*uterm_input_cb) (struct uterm_input *input,
 int uterm_input_new(struct uterm_input **out, struct ev_eloop *eloop,
 		    const char *model, const char *layout, const char *variant,
 		    const char *options, const char *locale, const char *keymap,
+		    const char *compose_file, size_t compose_file_len,
 		    unsigned int repeat_delay, unsigned int repeat_rate,
 		    uterm_input_log_t log, void *log_data);
 void uterm_input_ref(struct uterm_input *input);

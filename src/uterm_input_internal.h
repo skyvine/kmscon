@@ -92,7 +92,9 @@ int uxkb_desc_init(struct uterm_input *input,
 		   const char *variant,
 		   const char *options,
 		   const char *locale,
-		   const char *keymap);
+		   const char *keymap,
+		   const char *compose_file,
+		   size_t compose_file_len);
 void uxkb_desc_destroy(struct uterm_input *input);
 
 int uxkb_dev_init(struct uterm_input_dev *dev);

@@ -88,7 +88,9 @@ int uxkb_desc_init(struct uterm_input *input,
 		   const char *variant,
 		   const char *options,
 		   const char *locale,
-		   const char *keymap)
+		   const char *keymap,
+		   const char *compose_file,
+		   size_t compose_file_len)
 {
 	int ret;
 	struct xkb_rule_names rmlvo = {
@@ -160,6 +162,24 @@ int uxkb_desc_init(struct uterm_input *input,
 	} else {
 		llog_debug(input, "new keyboard description (%s, %s, %s, %s)",
 			   model, layout, variant, options);
+	}
+
+	if (compose_file && *compose_file) {
+		input->compose_table = xkb_compose_table_new_from_buffer(
+					input->ctx,
+					compose_file,
+					compose_file_len,
+					locale,
+					XKB_COMPOSE_FORMAT_TEXT_V1,
+					0);
+
+		if (input->compose_table) {
+			llog_debug(input,
+				   "new compose table from memory");
+		} else {
+			llog_warn(input, "cannot parse compose table, "
+				  "reverting to default");
+		}
 	}
 
 	if (!input->compose_table) {
