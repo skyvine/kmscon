@@ -650,6 +650,26 @@ static void seat_input_event(struct uterm_input *input,
 	}
 }
 
+/*
+ * Locale sucks, but we need its value for Compose support. Since we don't want
+ * to set it (or reset it), and glibc doesn't provide any other sane way of
+ * querying it, we just find it ourselves as described in locale(7).
+ */
+static const char *find_locale(void)
+{
+	const char *locale;
+
+	locale = getenv("LC_ALL");
+	if (!locale)
+		locale = getenv("LC_CTYPE");
+	if (!locale)
+		locale = getenv("LANG");
+	if (!locale)
+		locale = "C";
+
+	return locale;
+}
+
 int kmscon_seat_new(struct kmscon_seat **out,
 		    struct conf_ctx *main_conf,
 		    struct ev_eloop *eloop,
@@ -661,7 +681,9 @@ int kmscon_seat_new(struct kmscon_seat **out,
 {
 	struct kmscon_seat *seat;
 	int ret;
-	char *keymap;
+	const char *locale;
+	char *keymap, *compose_file;
+	size_t compose_file_len;
 
 	if (!out || !eloop || !vtm || !seatname)
 		return -EINVAL;
@@ -698,6 +720,8 @@ int kmscon_seat_new(struct kmscon_seat **out,
 		goto err_conf;
 	}
 
+	locale = find_locale();
+
 	/* TODO: The XKB-API currently requires zero-terminated strings as
 	 * keymap input. Hence, we have to read it in instead of using mmap().
 	 * We should fix this upstream! */
@@ -709,12 +733,23 @@ int kmscon_seat_new(struct kmscon_seat **out,
 				  seat->conf->xkb_keymap, ret);
 	}
 
+	compose_file = NULL;
+	compose_file_len = 0;
+	if (seat->conf->xkb_compose_file && *seat->conf->xkb_compose_file) {
+		ret = shl_read_file(seat->conf->xkb_compose_file,
+				    &compose_file, &compose_file_len);
+		if (ret)
+			log_error("cannot read compose file %s: %d",
+				  seat->conf->xkb_compose_file, ret);
+	}
+
 	ret = uterm_input_new(&seat->input, seat->eloop,
 			      seat->conf->xkb_model,
 			      seat->conf->xkb_layout,
 			      seat->conf->xkb_variant,
 			      seat->conf->xkb_options,
-			      keymap,
+			      locale, keymap, compose_file,
+			      compose_file_len,
 			      seat->conf->xkb_repeat_delay,
 			      seat->conf->xkb_repeat_rate,
 			      log_llog, NULL);
