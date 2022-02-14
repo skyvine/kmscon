@@ -43,3 +43,6 @@ docs/man/*.7
 src/*.vert.bin
 src/*.frag.bin
 src/*.xkb.bin
+src/*.vert.bin.c
+src/*.frag.bin.c
+src/*.xkb.bin.c
