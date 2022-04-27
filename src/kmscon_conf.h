@@ -34,6 +34,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <libtsm.h>
 #include "conf.h"
 #include "shl_dlist.h"
 
@@ -42,6 +43,8 @@ enum kmscon_conf_gpu_selection {
 	KMSCON_GPU_AUX,
 	KMSCON_GPU_PRIMARY,
 };
+
+typedef uint8_t palette_t[TSM_COLOR_NUM][3];
 
 struct kmscon_conf_t {
 	/* header information */
@@ -88,8 +91,6 @@ struct kmscon_conf_t {
 	char *term;
 	/* reset environment */
 	bool reset_env;
-	/* color palette */
-	char *palette;
 	/* terminal scroll-back buffer size */
 	unsigned int sb_size;
 
@@ -154,6 +155,12 @@ struct kmscon_conf_t {
 	char *font_name;
 	/* font ppi (overrides per monitor PPI) */
 	unsigned int font_ppi;
+
+	/* Palette Options */
+	/* color palette */
+	char *palette;
+	/* custom palette */
+	palette_t custom_palette;
 };
 
 int kmscon_conf_new(struct conf_ctx **out);

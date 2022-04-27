@@ -231,15 +231,6 @@
       </varlistentry>
 
       <varlistentry>
-        <term><option>--palette {name}</option></term>
-        <listitem>
-          <para>Change the default color-palette. This shouldn't be used
-                anymore. Dynamic color palettes should be implemented
-                instead.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
         <term><option>--sb-size {size}</option></term>
         <listitem>
           <para>Maximum scrollback-buffer line count. (default: 1000)</para>
@@ -520,6 +511,185 @@
         </listitem>
       </varlistentry>
     </variablelist>
+
+    <para>Palette Options:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><option>--palette {name}</option></term>
+        <listitem>
+          <para>Change the default color palette. Setting this to
+                <literal>custom</literal> takes the color palette from the
+                following options.</para>
+        </listitem>
+      </varlistentry>
+
+      <para>In the following options <replaceable>color</replaceable> is an RGB
+            color value written as three comma-separated integers between 0 and
+            255 inclusive.</para>
+
+      <varlistentry>
+        <term><option>--palette-black {color}</option></term>
+        <listitem>
+          <para>Change the black color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 0, 0, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-red {color}</option></term>
+        <listitem>
+          <para>Change the red color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 205, 0, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-green {color}</option></term>
+        <listitem>
+          <para>Change the green color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 0, 205, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-yellow {color}</option></term>
+        <listitem>
+          <para>Change the yellow color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 205, 205, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-blue {color}</option></term>
+        <listitem>
+          <para>Change the blue color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 0, 0, 238)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-magenta {color}</option></term>
+        <listitem>
+          <para>Change the magenta color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 205, 0, 205)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-cyan {color}</option></term>
+        <listitem>
+          <para>Change the cyan color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 0, 205, 205)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-grey {color}</option></term>
+        <listitem>
+          <para>Change the light grey color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 229, 229,229)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-dark-grey {color}</option></term>
+        <listitem>
+          <para>Change the dark grey color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 127, 127, 127)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-red {color}</option></term>
+        <listitem>
+          <para>Change the light red color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 255, 0, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-green {color}</option></term>
+        <listitem>
+          <para>Change the light green color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 0, 255, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-yellow {color}</option></term>
+        <listitem>
+          <para>Change the light yellow color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 255, 255, 0)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-blue {color}</option></term>
+        <listitem>
+          <para>Change the light blue color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 92, 92, 255)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-magenta {color}</option></term>
+        <listitem>
+          <para>Change the light magenta color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 255, 0, 255)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-light-cyan {color}</option></term>
+        <listitem>
+          <para>Change the light cyan color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 0, 255, 255)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-white {color}</option></term>
+        <listitem>
+          <para>Change the white color in the custom palette to
+                <replaceable>color</replaceable>.
+                (default: 255, 255, 255)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-foreground {color}</option></term>
+        <listitem>
+          <para>Change the default foreground color in the custom
+                palette to <replaceable>color</replaceable>.
+                (default: 229, 229, 229)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>--palette-background {color}</option></term>
+        <listitem>
+          <para>Change the default background color in the custom
+                palette to <replaceable>color</replaceable>.
+                (default: 0, 0, 0)</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
   </refsect1>
 
   <refsect1>
@@ -536,6 +706,7 @@
       font-name=Meslo LG M
       font-size=14
       login=/bin/bash -i
+      palette-foreground=255, 0, 0
     </programlisting>
 
     <para>Command-line options overwrite
