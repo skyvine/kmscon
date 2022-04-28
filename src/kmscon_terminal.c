@@ -623,7 +623,14 @@ int kmscon_terminal_register(struct kmscon_session **out,
 			  log_llog, NULL);
 	if (ret)
 		goto err_con;
-	tsm_vte_set_palette(term->vte, term->conf->palette);
+
+	ret = tsm_vte_set_palette(term->vte, term->conf->palette);
+	if (ret)
+		goto err_vte;
+
+	ret = tsm_vte_set_custom_palette(term->vte, term->conf->custom_palette);
+	if (ret)
+		goto err_vte;
 
 	ret = font_set(term);
 	if (ret)

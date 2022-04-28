@@ -94,8 +94,6 @@ static void print_help()
 		"\t    --reset-env             [on]\n"
 		"\t                              Reset environment before running child\n"
 		"\t                              process\n"
-		"\t    --palette <name>        [default]\n"
-		"\t                              Select the used color palette\n"
 		"\t    --sb-size <num>         [1000]\n"
 		"\t                              Size of the scrollback-buffer in lines\n"
 		"\n"
@@ -153,7 +151,51 @@ static void print_help()
 		"\t    --font-name <name>      [monospace]\n"
 		"\t                              Font name\n"
 		"\t    --font-dpi <dpi>        [96]\n"
-		"\t                              Force DPI value for all fonts\n",
+		"\t                              Force DPI value for all fonts\n"
+		"\n"
+		"Palette Options:\n"
+		"\t    --palette <name>                [default]\n"
+		"\t                                      Select the used color palette.\n"
+		"\t                                      'custom' uses the following color\n"
+		"\t                                      options.\n"
+		"\t    --palette-black <color>         [  0,   0,   0]\n"
+		"\t                                      Black in custom palette\n"
+		"\t    --palette-red <color>           [205,   0,   0]\n"
+		"\t                                      Red in custom palette\n"
+		"\t    --palette-green <color>         [  0, 205,   0]\n"
+		"\t                                      Green in custom palette\n"
+		"\t    --palette-yellow <color>        [205, 205,   0]\n"
+		"\t                                      Yellow in custom palette\n"
+		"\t    --palette-blue <color>          [  0,   0, 238]\n"
+		"\t                                      Blue in custom palette\n"
+		"\t    --palette-magenta <color>       [205,   0, 205]\n"
+		"\t                                      Magenta in custom palette\n"
+		"\t    --palette-cyan <color>          [  0, 205, 205]\n"
+		"\t                                      Cyan in custom palette\n"
+		"\t    --palette-light-grey <color>    [229, 229, 229]\n"
+		"\t                                      Light grey in custom palette\n"
+		"\t    --palette-dark-grey <color>     [127, 127, 127]\n"
+		"\t                                      Dark grey in custom palette\n"
+		"\t    --palette-light-red <color>     [255,   0,   0]\n"
+		"\t                                      Light red in custom palette\n"
+		"\t    --palette-light-green <color>   [  0, 255,   0]\n"
+		"\t                                      Light green in custom palette\n"
+		"\t    --palette-light-yellow <color>  [255, 255,   0]\n"
+		"\t                                      Light yellow in custom palette\n"
+		"\t    --palette-light-blue <color>    [ 92,  92, 255]\n"
+		"\t                                      Light blue in custom palette\n"
+		"\t    --palette-light-magenta <color> [255,   0, 255]\n"
+		"\t                                      Light magenta in custom palette\n"
+		"\t    --palette-light-cyan <color>    [  0, 255, 255]\n"
+		"\t                                      Lighty cyan in custom palette\n"
+		"\t    --palette-white <color>         [255, 255, 255]\n"
+		"\t                                      White in custom palette\n"
+		"\t    --palette-foreground <color>    [229, 229, 229]\n"
+		"\t                                      Default foreground color in\n"
+		"\t                                      custom palette\n"
+		"\t    --palette-background <color>    [  0,   0,   0]\n"
+		"\t                                      Default background color in\n"
+		"\t                                      custom palette\n",
 		"kmscon");
 	/*
 	 * 80 char line:
@@ -409,6 +451,77 @@ static const struct conf_type conf_gpus = {
 };
 
 /*
+ * Color type
+ * The color parser parses three comma-separated numbers into an RGB color.
+ */
+
+static void conf_default_color(struct conf_option *opt)
+{
+	memcpy(opt->mem, opt->def, 3);
+}
+
+static int conf_parse_color(struct conf_option *opt, bool on, const char *arg)
+{
+	int ret;
+	char **list = NULL;
+	unsigned int list_num, i, val;
+
+	ret = shl_split_string(arg, &list, &list_num, ',', true);
+	if (ret) {
+		log_error("cannot split '%s' config-option argument",
+			  opt->long_name + 3);
+		return ret;
+	}
+	if (list_num != 3) {
+		log_error("%u values given for '%s' config-option argument, "
+			  "3 expected", list_num, opt->long_name + 3);
+		ret = -EFAULT;
+		goto out_free;
+	}
+
+	for (i = 0; i < 3; ++i) {
+		ret = shl_strtou(list[i], &val);
+		if (ret) {
+			log_error("cannot parse color value '%s'", list[i]);
+			goto out_free;
+		}
+		if (val > UINT8_MAX) {
+			log_error("color value must be less than 255");
+			ret = -EFAULT;
+			goto out_free;
+		}
+		((uint8_t*)opt->mem)[i] = val;
+	}
+
+out_free:
+	free(list);
+	return ret;
+}
+
+static int conf_copy_color(struct conf_option *opt,
+			   const struct conf_option *src)
+{
+	memcpy(opt->mem, src->mem, 3);
+	return 0;
+}
+
+/*
+ * Color: expects "mem" to point to an "uint8_t[3]"
+ * There is no need to allocate or deallocate extra memory, so there is no
+ * "free" pointer.
+ */
+
+static const struct conf_type conf_color = {
+	.flags = CONF_HAS_ARG,
+	.set_default = conf_default_color,
+	.parse = conf_parse_color,
+	.copy = conf_copy_color,
+};
+
+#define CONF_OPTION_COLOR(_long, _mem_palette, _offset) \
+	CONF_OPTION(0, 0, _long, &conf_color, NULL, NULL, NULL, &(_mem_palette)[_offset], &def_palette[_offset])
+
+/*
  * Custom Afterchecks
  * Several other options have side-effects on other options. We use afterchecks
  * to enforce these. They're pretty simple. See below.
@@ -532,6 +645,28 @@ static struct conf_grab def_grab_session_close =
 static struct conf_grab def_grab_terminal_new =
 		CONF_SINGLE_GRAB(SHL_CONTROL_MASK | SHL_LOGO_MASK, XKB_KEY_Return);
 
+static palette_t def_palette = {
+	[TSM_COLOR_BLACK]         = {   0,   0,   0 }, /* black */
+	[TSM_COLOR_RED]           = { 205,   0,   0 }, /* red */
+	[TSM_COLOR_GREEN]         = {   0, 205,   0 }, /* green */
+	[TSM_COLOR_YELLOW]        = { 205, 205,   0 }, /* yellow */
+	[TSM_COLOR_BLUE]          = {   0,   0, 238 }, /* blue */
+	[TSM_COLOR_MAGENTA]       = { 205,   0, 205 }, /* magenta */
+	[TSM_COLOR_CYAN]          = {   0, 205, 205 }, /* cyan */
+	[TSM_COLOR_LIGHT_GREY]    = { 229, 229, 229 }, /* light grey */
+	[TSM_COLOR_DARK_GREY]     = { 127, 127, 127 }, /* dark grey */
+	[TSM_COLOR_LIGHT_RED]     = { 255,   0,   0 }, /* light red */
+	[TSM_COLOR_LIGHT_GREEN]   = {   0, 255,   0 }, /* light green */
+	[TSM_COLOR_LIGHT_YELLOW]  = { 255, 255,   0 }, /* light yellow */
+	[TSM_COLOR_LIGHT_BLUE]    = {  92,  92, 255 }, /* light blue */
+	[TSM_COLOR_LIGHT_MAGENTA] = { 255,   0, 255 }, /* light magenta */
+	[TSM_COLOR_LIGHT_CYAN]    = {   0, 255, 255 }, /* light cyan */
+	[TSM_COLOR_WHITE]         = { 255, 255, 255 }, /* white */
+
+	[TSM_COLOR_FOREGROUND]    = { 229, 229, 229 }, /* light grey */
+	[TSM_COLOR_BACKGROUND]    = {   0,   0,   0 }, /* black */
+};
+
 int kmscon_conf_new(struct conf_ctx **out)
 {
 	struct conf_ctx *ctx;
@@ -569,7 +704,6 @@ int kmscon_conf_new(struct conf_ctx **out)
 		CONF_OPTION(0, 'l', "login", &conf_login, aftercheck_login, NULL, file_login, &conf->login, false),
 		CONF_OPTION_STRING('t', "term", &conf->term, "xterm-256color"),
 		CONF_OPTION_BOOL(0, "reset-env", &conf->reset_env, true),
-		CONF_OPTION_STRING(0, "palette", &conf->palette, NULL),
 		CONF_OPTION_UINT(0, "sb-size", &conf->sb_size, 1000),
 
 		/* Input Options */
@@ -606,6 +740,27 @@ int kmscon_conf_new(struct conf_ctx **out)
 		CONF_OPTION_UINT(0, "font-size", &conf->font_size, 12),
 		CONF_OPTION_STRING(0, "font-name", &conf->font_name, "monospace"),
 		CONF_OPTION_UINT(0, "font-dpi", &conf->font_ppi, 96),
+
+		/* Palette Options */
+		CONF_OPTION_STRING(0, "palette", &conf->palette, NULL),
+		CONF_OPTION_COLOR("palette-black", conf->custom_palette, TSM_COLOR_BLACK),
+		CONF_OPTION_COLOR("palette-red", conf->custom_palette, TSM_COLOR_RED),
+		CONF_OPTION_COLOR("palette-green", conf->custom_palette, TSM_COLOR_GREEN),
+		CONF_OPTION_COLOR("palette-yellow", conf->custom_palette, TSM_COLOR_YELLOW),
+		CONF_OPTION_COLOR("palette-blue", conf->custom_palette, TSM_COLOR_BLUE),
+		CONF_OPTION_COLOR("palette-magenta", conf->custom_palette, TSM_COLOR_MAGENTA),
+		CONF_OPTION_COLOR("palette-cyan", conf->custom_palette, TSM_COLOR_CYAN),
+		CONF_OPTION_COLOR("palette-light-grey", conf->custom_palette, TSM_COLOR_LIGHT_GREY),
+		CONF_OPTION_COLOR("palette-dark-grey", conf->custom_palette, TSM_COLOR_DARK_GREY),
+		CONF_OPTION_COLOR("palette-light-red", conf->custom_palette, TSM_COLOR_LIGHT_RED),
+		CONF_OPTION_COLOR("palette-light-green", conf->custom_palette, TSM_COLOR_LIGHT_GREEN),
+		CONF_OPTION_COLOR("palette-light-yellow", conf->custom_palette, TSM_COLOR_LIGHT_YELLOW),
+		CONF_OPTION_COLOR("palette-light-blue", conf->custom_palette, TSM_COLOR_LIGHT_BLUE),
+		CONF_OPTION_COLOR("palette-light-magenta", conf->custom_palette, TSM_COLOR_LIGHT_MAGENTA),
+		CONF_OPTION_COLOR("palette-light-cyan", conf->custom_palette, TSM_COLOR_LIGHT_CYAN),
+		CONF_OPTION_COLOR("palette-white", conf->custom_palette, TSM_COLOR_WHITE),
+		CONF_OPTION_COLOR("palette-foreground", conf->custom_palette, TSM_COLOR_FOREGROUND),
+		CONF_OPTION_COLOR("palette-background", conf->custom_palette, TSM_COLOR_BACKGROUND),
 	};
 
 	ret = conf_ctx_new(&ctx, options, sizeof(options) / sizeof(*options),
