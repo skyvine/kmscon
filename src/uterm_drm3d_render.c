@@ -51,27 +51,14 @@
 #include "uterm_drm3d_internal.h"
 #include "uterm_video.h"
 #include "uterm_video_internal.h"
+#include "uterm_drm3d_blend.vert.bin.h"
+#include "uterm_drm3d_blend.frag.bin.h"
+#include "uterm_drm3d_blit.vert.bin.h"
+#include "uterm_drm3d_blit.frag.bin.h"
+#include "uterm_drm3d_fill.vert.bin.h"
+#include "uterm_drm3d_fill.frag.bin.h"
 
 #define LOG_SUBSYSTEM "uterm_drm3d_render"
-
-extern const char *_binary_src_uterm_drm3d_blend_vert_bin_start;
-extern const char *_binary_src_uterm_drm3d_blend_vert_bin_end;
-extern const size_t _binary_src_uterm_drm3d_blend_vert_bin_size;
-extern const char *_binary_src_uterm_drm3d_blend_frag_bin_start;
-extern const char *_binary_src_uterm_drm3d_blend_frag_bin_end;
-extern const size_t _binary_src_uterm_drm3d_blend_frag_bin_size;
-extern const char *_binary_src_uterm_drm3d_blit_vert_bin_start;
-extern const char *_binary_src_uterm_drm3d_blit_vert_bin_end;
-extern const size_t _binary_src_uterm_drm3d_blit_vert_bin_size;
-extern const char *_binary_src_uterm_drm3d_blit_frag_bin_start;
-extern const char *_binary_src_uterm_drm3d_blit_frag_bin_end;
-extern const size_t _binary_src_uterm_drm3d_blit_frag_bin_size;
-extern const char *_binary_src_uterm_drm3d_fill_vert_bin_start;
-extern const char *_binary_src_uterm_drm3d_fill_vert_bin_end;
-extern const size_t _binary_src_uterm_drm3d_fill_vert_bin_size;
-extern const char *_binary_src_uterm_drm3d_fill_frag_bin_start;
-extern const char *_binary_src_uterm_drm3d_fill_frag_bin_end;
-extern const size_t _binary_src_uterm_drm3d_fill_frag_bin_size;
 
 static int init_shaders(struct uterm_video *video)
 {
@@ -92,18 +79,18 @@ static int init_shaders(struct uterm_video *video)
 
 	v3d->sinit = 1;
 
-	blend_vert = _binary_src_uterm_drm3d_blend_vert_bin_start;
-	blend_vlen = _binary_src_uterm_drm3d_blend_vert_bin_size;
-	blend_frag = _binary_src_uterm_drm3d_blend_frag_bin_start;
-	blend_flen = _binary_src_uterm_drm3d_blend_frag_bin_size;
-	blit_vert = _binary_src_uterm_drm3d_blit_vert_bin_start;
-	blit_vlen = _binary_src_uterm_drm3d_blit_vert_bin_size;
-	blit_frag = _binary_src_uterm_drm3d_blit_frag_bin_start;
-	blit_flen = _binary_src_uterm_drm3d_blit_frag_bin_size;
-	fill_vert = _binary_src_uterm_drm3d_fill_vert_bin_start;
-	fill_vlen = _binary_src_uterm_drm3d_fill_vert_bin_size;
-	fill_frag = _binary_src_uterm_drm3d_fill_frag_bin_start;
-	fill_flen = _binary_src_uterm_drm3d_fill_frag_bin_size;
+	blend_vert = _binary_uterm_drm3d_blend_vert_start;
+	blend_vlen = _binary_uterm_drm3d_blend_vert_size;
+	blend_frag = _binary_uterm_drm3d_blend_frag_start;
+	blend_flen = _binary_uterm_drm3d_blend_frag_size;
+	blit_vert = _binary_uterm_drm3d_blit_vert_start;
+	blit_vlen = _binary_uterm_drm3d_blit_vert_size;
+	blit_frag = _binary_uterm_drm3d_blit_frag_start;
+	blit_flen = _binary_uterm_drm3d_blit_frag_size;
+	fill_vert = _binary_uterm_drm3d_fill_vert_start;
+	fill_vlen = _binary_uterm_drm3d_fill_vert_size;
+	fill_frag = _binary_uterm_drm3d_fill_frag_start;
+	fill_flen = _binary_uterm_drm3d_fill_frag_size;
 
 	ret = gl_shader_new(&v3d->fill_shader, fill_vert, fill_vlen,
 			    fill_frag, fill_flen, fill_attr, 2, log_llog,

@@ -47,6 +47,7 @@
 #include "shl_hashtable.h"
 #include "shl_log.h"
 #include "uterm_video.h"
+#include "font_unifont_data.bin.h"
 
 #define LOG_SUBSYSTEM "font_unifont"
 
@@ -61,10 +62,6 @@ struct unifont_data {
 	uint8_t len;
 	uint8_t data[32];
 } __attribute__((__packed__));
-
-extern const char *_binary_src_font_unifont_data_bin_start;
-extern const char *_binary_src_font_unifont_data_bin_end;
-extern const size_t _binary_src_font_unifont_data_bin_size;
 
 /*
  * Global glyph cache
@@ -137,8 +134,8 @@ static int find_glyph(uint32_t ch, const struct kmscon_glyph **out)
 		goto out_unlock;
 	}
 
-	start = (const struct unifont_data*)_binary_src_font_unifont_data_bin_start;
-	end = (const struct unifont_data*)_binary_src_font_unifont_data_bin_end;
+	start = (const struct unifont_data*)_binary_font_unifont_data_start;
+	end = (const struct unifont_data*)_binary_font_unifont_data_end;
 	d = &start[ch];
 
 	if (d >= end) {
@@ -213,7 +210,7 @@ static int kmscon_font_unifont_init(struct kmscon_font *out,
 
 	log_debug("loading static unifont font");
 
-	if (_binary_src_font_unifont_data_bin_size == 0) {
+	if (_binary_font_unifont_data_size == 0) {
 		log_error("unifont glyph information not found in binary");
 		return -EFAULT;
 	}

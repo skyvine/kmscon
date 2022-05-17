@@ -38,12 +38,9 @@
 #include "shl_misc.h"
 #include "uterm_input.h"
 #include "uterm_input_internal.h"
+#include "uterm_input_fallback.xkb.bin.h"
 
 #define LLOG_SUBSYSTEM "uterm_uxkb"
-
-extern const char *_binary_src_uterm_input_fallback_xkb_bin_start;
-extern const char *_binary_src_uterm_input_fallback_xkb_bin_end;
-extern const size_t _binary_src_uterm_input_fallback_xkb_bin_size;
 
 static void uxkb_log(struct xkb_context *context, enum xkb_log_level level,
 		     const char *format, va_list args)
@@ -102,7 +99,7 @@ int uxkb_desc_init(struct uterm_input *input,
 	};
 	const char *fallback;
 
-	fallback = _binary_src_uterm_input_fallback_xkb_bin_start;
+	fallback = _binary_uterm_input_fallback_xkb_start;
 
 	input->ctx = xkb_context_new(0);
 	if (!input->ctx) {
