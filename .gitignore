@@ -11,6 +11,7 @@ aclocal.m4
 autom4te.cache/
 build-aux/
 build/
+compile_commands.json
 config.h
 config.h.in
 config.h.in~
@@ -30,6 +31,7 @@ stamp-*
 genunifont
 src/shl_githead.c
 src/font_unifont_data.bin
+src/font_unifont_data.bin.c
 docs/reference/*.txt
 docs/reference/*.bak
 docs/reference/kmscon.????*
