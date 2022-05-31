@@ -416,6 +416,10 @@ static int video_init(struct uterm_video *video, const char *node)
 	EGLBoolean b;
 	struct uterm_drm_video *vdrm;
 	struct uterm_drm3d_video *v3d;
+	EGLConfig *cfgs = NULL;
+	EGLint gbmFmt;
+	EGLint cfgId;
+	EGLint err;
 
 	v3d = malloc(sizeof(*v3d));
 	if (!v3d)
@@ -471,11 +475,53 @@ static int video_init(struct uterm_video *video, const char *node)
 		goto err_disp;
 	}
 
-	b = eglChooseConfig(v3d->disp, conf_att, &v3d->conf, 1, &n);
-	if (!b || n != 1) {
-		log_error("cannot find a proper EGL framebuffer configuration");
+	b = eglChooseConfig(v3d->disp, conf_att, cfgs, n, &n);
+	if (!b || n == 0) {
+		log_error("no EGL configs found");
 		ret = -EFAULT;
 		goto err_disp;
+	}
+
+	cfgs = malloc(sizeof(EGLConfig) * n);
+	if (cfgs == NULL) {
+		log_error("failed to allocate memory for %d configs", n);
+		ret = -ENOMEM;
+		goto err_disp;
+	}
+
+	b = eglChooseConfig(v3d->disp, conf_att, cfgs, n, &n);
+	if (!b) {
+		log_error("failed to load EGL configs");
+		ret = -EFAULT;
+		goto err_cfgs;
+	}
+
+	log_debug("got %d EGL configs", n);
+	b = false;
+	for (EGLint i = 0; i < n; i++) {
+		if (!eglGetConfigAttrib(v3d->disp, cfgs[i], EGL_NATIVE_VISUAL_ID, &gbmFmt)) {
+			err = eglGetError();
+			log_warn("cfgs[%d] failed to get format (error %x), skipping...", i, err);
+			continue;
+		}
+		log_debug("cfgs[%d] format %x", i, gbmFmt);
+		if (gbmFmt == GBM_FORMAT_XRGB8888 || gbmFmt == GBM_FORMAT_ARGB8888) {
+			if (!eglGetConfigAttrib(v3d->disp, cfgs[i], EGL_CONFIG_ID, &cfgId)) {
+				err = eglGetError();
+				log_warning("cfgs[%d] matched, but failed to get ID (error %x).", i, err);
+			} else {
+				log_debug("config with ID %x matched", cfgId);
+			}
+			memcpy(&v3d->conf, &cfgs[i], sizeof(EGLConfig));
+			b = true;
+			break;
+		}
+	}
+
+	if (!b) {
+		log_error("no config had matching gbm format");
+		ret = -EFAULT;
+		goto err_cfgs;
 	}
 
 	v3d->ctx = eglCreateContext(v3d->disp, v3d->conf, EGL_NO_CONTEXT,
@@ -483,7 +529,7 @@ static int video_init(struct uterm_video *video, const char *node)
 	if (v3d->ctx == EGL_NO_CONTEXT) {
 		log_error("cannot create egl context");
 		ret = -EFAULT;
-		goto err_disp;
+		goto err_cfgs;
 	}
 
 	if (!eglMakeCurrent(v3d->disp, EGL_NO_SURFACE, EGL_NO_SURFACE,
@@ -503,6 +549,8 @@ static int video_init(struct uterm_video *video, const char *node)
 
 err_ctx:
 	eglDestroyContext(v3d->disp, v3d->ctx);
+err_cfgs:
+	free(cfgs);
 err_disp:
 	eglTerminate(v3d->disp);
 err_gbm:
