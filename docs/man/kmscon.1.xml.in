@@ -104,7 +104,7 @@
       <varlistentry>
         <term><option>--configdir {/path/to/config/dir/}</option></term>
         <listitem>
-          <para>Specify path to config directory. (default: /etc/kmscon/)</para>
+          <para>Specify path to config directory. (default: @CONFIG_DIR@)</para>
         </listitem>
       </varlistentry>
 
@@ -129,7 +129,7 @@
                 use this option if kmscon runs on multiple seats
                 (see <option>--seats</option>). To avoid this, specify this
                 option in a seat configuration
-                <filename>/etc/kmscon/{seat}.kmscon.conf</filename>.</para>
+                <filename>@CONFIG_DIR@/{seat}.kmscon.conf</filename>.</para>
           <para>You must not run multiple applications on a single VT,
                 otherwise, you might get an unresponsive system. Also note, by
                 default, kmscon tries to use it's controlling terminal as VT and
@@ -694,11 +694,11 @@
 
   <refsect1>
     <title>Configuration</title>
-    <para>Default configuration directory is <filename>/etc/kmscon/</filename>
+    <para>Default configuration directory is <filename>@CONFIG_DIR@</filename>
           and the main configuration file is called
-          <filename>/etc/kmscon/kmscon.conf</filename>. You can provide an
+          <filename>@CONFIG_DIR@/kmscon.conf</filename>. You can provide an
           additional configuration file for each seat via
-          <filename>/etc/kmscon/{seatname}.kmscon.conf</filename>.
+          <filename>@CONFIG_DIR@/{seatname}.kmscon.conf</filename>.
           Any command-line option that can be passed to kmscon can also be put
           into those configuration files.  For example:</para>
 

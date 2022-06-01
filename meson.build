@@ -33,6 +33,7 @@ add_project_arguments(
 #
 prefix = get_option('prefix')
 bindir = get_option('bindir')
+sysconfdir = get_option('sysconfdir') / meson.project_name()
 libexecdir = get_option('libexecdir') / meson.project_name()
 mandir = get_option('mandir')
 moduledir = get_option('libdir') / meson.project_name()
@@ -105,6 +106,7 @@ foreach name, reqs : {
 endforeach
 
 config.set_quoted('BUILD_MODULE_DIR', prefix / moduledir)
+config.set_quoted('BUILD_CONFIG_DIR', prefix / sysconfdir)
 
 # Make all files include "config.h" by default. This shouldn't cause any
 # problems and we cannot forget to include it anymore.
@@ -135,6 +137,7 @@ summary({
   'prefix': prefix,
   'libexecdir': libexecdir,
   'bindir': bindir,
+  'sysconfdir': sysconfdir,
   'moduledir': moduledir,
   'mandir': mandir,
 }, section: 'Directories')

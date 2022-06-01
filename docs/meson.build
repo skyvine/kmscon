@@ -3,11 +3,15 @@
 # SPDX-License-Identifier: MIT
 
 manpages = [
-  'kmscon.1.xml',
+  'kmscon.1.xml.in',
 ]
 
+data = configuration_data()
+data.set('CONFIG_DIR', prefix / sysconfdir)
+
 foreach man : manpages
-  name = fs.replace_suffix(man, '')
+  xml = configure_file(input: f'man/@man@', output: '@BASENAME@', configuration: data)
+  name = fs.replace_suffix(fs.replace_suffix(man, ''), '')
   custom_target(
     name,
     command: [
@@ -22,7 +26,7 @@ foreach man : manpages
       '@INPUT@'
     ],
     input: [
-      f'man/@man@',
+      xml
     ],
     output: name,
     build_by_default: true,
