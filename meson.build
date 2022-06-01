@@ -12,7 +12,7 @@ project('kmscon', 'c',
     'warning_level=1',
     'werror=true',
     'buildtype=debugoptimized',
-    'c_std=c17',
+    'c_std=gnu99',
   ]
 )
 
@@ -41,6 +41,7 @@ moduledir = get_option('libdir') / meson.project_name()
 # Required dependencies
 #
 python = import('python').find_installation()
+fs = import('fs')
 
 xkbcommon_deps = dependency('xkbcommon', version: '>=0.5.0')
 libtsm_deps = dependency('libtsm', version: '>=4.0.0')
@@ -118,7 +119,7 @@ add_project_arguments('-include', abs_config_h, language: 'c')
 manpages_stylesheet = 'http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl'
 have_manpages_stylesheet = false
 if xsltproc.found()
-  have_manpages_stylesheet = run_command(xsltproc, '--nonet', manpages_stylesheet, check: false).returncode() != 0
+  have_manpages_stylesheet = run_command(xsltproc, '--nonet', manpages_stylesheet, check: false).returncode() == 0
 endif
 enable_docs = get_option('docs').require(xsltproc.found() and have_manpages_stylesheet).allowed()
 

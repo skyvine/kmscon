@@ -22,7 +22,7 @@
 # SOFTWARE.
 
 # configuration path
-helperdir=${libexecdir}
+helperdir=@libexecdir@
 
 # Get a property from org.freedesktop.locale1
 queryLocale1() {
