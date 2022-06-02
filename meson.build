@@ -41,7 +41,6 @@ moduledir = get_option('libdir') / meson.project_name()
 #
 # Required dependencies
 #
-python = import('python').find_installation()
 fs = import('fs')
 
 xkbcommon_deps = dependency('xkbcommon', version: '>=0.5.0')
@@ -50,6 +49,8 @@ libudev_deps = dependency('libudev', version: '>=172')
 libdrm_deps = dependency('libdrm')
 dl_deps = dependency('dl')
 threads_deps = dependency('threads')
+
+python = find_program('python3')
 
 #
 # Dependencies
