@@ -1,0 +1,43 @@
+# The way this works is a little weird. But basically, the create-release job
+# runs purely to initialize the GitHub release itself. Once done, the upload
+# URL of the release is saved as an artifact.
+#
+# The build-release job runs only once create-release is finished. It gets
+# the release upload URL by downloading the corresponding artifact (which was
+# uploaded by create-release). It then builds the release executables for each
+# supported platform and attaches them as release assets to the previously
+# created release.
+#
+# The key here is that we create the release only once.
+#
+# Adapted from: https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/release.yml
+
+name: release
+on:
+  push:
+    # Enable when testing release infrastructure on a branch.
+    branches:
+    - build
+    tags:
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+jobs:
+  create-release:
+    name: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+      - name: Install meson
+        run: pip install meson ninja
+      - name: Meson setup
+        run: meson setup builddir/
+      - name: Create source distribution
+        # no unit tests yet
+        run: meson dist -C builddir/ --no-tests
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: builddir/meson-dist/*
+
