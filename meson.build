@@ -54,17 +54,23 @@ python = find_program('python3')
 
 #
 # Dependencies
-# This unconditionally checks for all dependencies even if they are disabled. We
-# later look whether all required depedencies are met and finish the
-# configuration.
+# These are controlled by feature options.
+# When the feature is disabled, the corresponding dependency is not searched,
+# instad, a disabler object is produced to disable anything uses it.
+# This also allows early reporting when a feature is enabled but its dependencis
+# are not found.
 #
-libsystemd_deps = dependency('libsystemd', required: false)
-gbm_deps = dependency('gbm', required: false)
-egl_deps = dependency('egl', required: false)
-glesv2_deps = dependency('glesv2', required: false)
-pango_deps = dependency('pangoft2', required: false)
-pixman_deps = dependency('pixman-1', required: false)
-xsltproc = find_program('xsltproc', native: true, required: false)
+require_glesv2 = get_option('video_drm3d').enabled() or get_option('renderer_gltex').enabled()
+require_libdrm = get_option('video_drm2d').enabled() or get_option('video_drm3d').enabled()
+
+libsystemd_deps = dependency('libsystemd', disabler: true, required: get_option('multi_seat'))
+libdrm_deps = dependency('libdrm', disabler: true, required: require_libdrm)
+gbm_deps = dependency('gbm', disabler: true, required: get_option('video_drm3d'))
+egl_deps = dependency('egl', disabler: true, required: get_option('video_drm3d'))
+glesv2_deps = dependency('glesv2', disabler: true, required: require_glesv2)
+pango_deps = dependency('pangoft2', disabler: true, required: get_option('font_pango'))
+pixman_deps = dependency('pixman-1', disabler: true, required: get_option('renderer_pixman'))
+xsltproc = find_program('xsltproc', native: true, disabler: true, required: get_option('docs'))
 
 #
 # Handle feature options
@@ -79,6 +85,7 @@ sections = {
   'session': 'Session Types',
 }
 config = configuration_data()
+# Note: keep this in sync with the dependencies above
 foreach name, reqs : {
   'multi_seat': [libsystemd_deps],
   'video_fbdev': [],
@@ -106,6 +113,7 @@ foreach name, reqs : {
   summary(name, enabled, section: sections.get(name.split('_')[0], 'Miscellaneous'))
 endforeach
 
+config.set('BUILD_ENABLE_DEBUG', get_option('extra_debug'))
 config.set_quoted('BUILD_MODULE_DIR', prefix / moduledir)
 config.set_quoted('BUILD_CONFIG_DIR', prefix / sysconfdir)
 
@@ -143,7 +151,7 @@ summary({
   'mandir': mandir,
 }, section: 'Directories')
 summary({
-  'extra-debug': get_option('extra_debug'),
+  'extra_debug': get_option('extra_debug'),
   'tests': get_option('tests'),
   'docs': enable_docs,
 }, section: 'Miscellaneous')
