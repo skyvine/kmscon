@@ -48,3 +48,4 @@ src/*.xkb.bin
 src/*.vert.bin.c
 src/*.frag.bin.c
 src/*.xkb.bin.c
+.cache/

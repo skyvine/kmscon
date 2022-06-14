@@ -22,10 +22,7 @@
 # SOFTWARE.
 
 # configuration path
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libexecdir=@libexecdir@
-helperdir=${libexecdir}/kmscon
+helperdir=@libexecdir@
 
 # Get a property from org.freedesktop.locale1
 queryLocale1() {

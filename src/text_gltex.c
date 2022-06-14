@@ -52,6 +52,8 @@
 #include "shl_misc.h"
 #include "text.h"
 #include "uterm_video.h"
+#include "text_gltex_atlas.frag.bin.h"
+#include "text_gltex_atlas.vert.bin.h"
 
 #define LOG_SUBSYSTEM "text_gltex"
 
@@ -141,13 +143,6 @@ static void free_glyph(void *data)
 	free(glyph);
 }
 
-extern const char *_binary_src_text_gltex_atlas_vert_bin_start;
-extern const char *_binary_src_text_gltex_atlas_vert_bin_end;
-extern const size_t _binary_src_text_gltex_atlas_vert_bin_size;
-extern const char *_binary_src_text_gltex_atlas_frag_bin_start;
-extern const char *_binary_src_text_gltex_atlas_frag_bin_end;
-extern const size_t _binary_src_text_gltex_atlas_frag_bin_size;
-
 static int gltex_set(struct kmscon_text *txt)
 {
 	struct gltex *gt = txt->data;
@@ -180,10 +175,10 @@ static int gltex_set(struct kmscon_text *txt)
 		goto err_bold_htable;
 	}
 
-	vert = _binary_src_text_gltex_atlas_vert_bin_start;
-	vlen = _binary_src_text_gltex_atlas_vert_bin_size;
-	frag = _binary_src_text_gltex_atlas_frag_bin_start;
-	flen = _binary_src_text_gltex_atlas_frag_bin_size;
+	vert = _binary_text_gltex_atlas_vert_start;
+	vlen = _binary_text_gltex_atlas_vert_size;
+	frag = _binary_text_gltex_atlas_frag_start;
+	flen = _binary_text_gltex_atlas_frag_size;
 	gl_clear_error();
 
 	ret = gl_shader_new(&gt->shader, vert, vlen, frag, flen, attr, 4,

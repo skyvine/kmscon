@@ -65,7 +65,7 @@ static void print_help()
 		"\t-v, --verbose               [off]   Print verbose messages\n"
 		"\t    --debug                 [off]   Enable debug mode\n"
 		"\t    --silent                [off]   Suppress notices and warnings\n"
-		"\t-c, --configdir </foo/bar>  [/etc/kmscon]\n"
+		"\t-c, --configdir </foo/bar>  [" BUILD_CONFIG_DIR "]\n"
 		"\t                                    Path to config directory\n"
 		"\t    --listen                [off]   Listen for new seats and spawn\n"
 		"\t                                    sessions accordingly (daemon mode)\n"
@@ -687,7 +687,7 @@ int kmscon_conf_new(struct conf_ctx **out)
 		CONF_OPTION_BOOL('v', "verbose", &conf->verbose, false),
 		CONF_OPTION_BOOL_FULL(0, "debug", aftercheck_debug, NULL, NULL, &conf->debug, false),
 		CONF_OPTION_BOOL(0, "silent", &conf->silent, false),
-		CONF_OPTION_STRING('c', "configdir", &conf->configdir, "/etc/kmscon"),
+		CONF_OPTION_STRING('c', "configdir", &conf->configdir, BUILD_CONFIG_DIR),
 		CONF_OPTION_BOOL_FULL(0, "listen", aftercheck_listen, NULL, NULL, &conf->listen, false),
 
 		/* Seat Options */
