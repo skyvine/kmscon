@@ -1,5 +1,26 @@
 = KMSCON Release News =
 
+CHANGES WITH 9.0.0:
+	* Modernized build system from autotools to meson.
+
+	* Note that many features rely on newer version of libtsm,
+	  thus we now requires libtsm >= 4.0.0 from the maintained fork at
+	  https://github.com/Aetf/libtsm.
+
+	* New features!
+	    - Custom palette support (#39)
+	    - Compose (dead-key) support (#36)
+	    - 24bit fbdev support (#8)
+	    - Detect XKB layout from localed (#7)
+	    - Underline and italic font (#3)
+
+	* Bug fixes
+	    - Fixed thin pixel lines at some screen edges (dac3c31b9e78ab28545caf88cbd8105a8c62052e)
+	    - Fixed many undefined behaviors and other minor bugs
+	    - Modernized codebase by moving away from deprecated symbols
+
+	* Many small fixes to documentation.
+
 CHANGES WITH 8:
 	* Several build-tools changes. Please adjust your build-scripts
 	  accoringly:
