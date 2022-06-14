@@ -3,7 +3,7 @@ on:
   push:
     # Enable when testing release infrastructure on a branch.
     branches:
-    - build
+    - release-*
     tags:
     - 'v[0-9]+.[0-9]+.[0-9]+'
 jobs:
@@ -17,6 +17,23 @@ jobs:
           python-version: '3.x'
       - name: Install meson
         run: pip install meson ninja
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y libudev-dev libxkbcommon-dev libdrm-dev libgbm-dev libegl1-mesa-dev libgles-dev libpango1.0-dev libsystemd-dev
+      - name: Install libtsm
+        run: |
+          pip install cmake
+          curl -L -o libtsm.tar.gz $(curl -s https://api.github.com/repos/Aetf/libtsm/releases/latest \
+            | grep "tarball_url" \
+            | awk '{ print $2 }' \
+            | sed 's/,$//'       \
+            | sed 's/"//g' )
+          mkdir libtsm
+          tar -xf libtsm.tar.gz -C libtsm --strip 1
+          cd libtsm
+          cmake -Bbuilddir
+          cmake --build builddir
+          sudo cmake --install builddir
       - name: Meson setup
         run: meson setup builddir/
       - name: Create source distribution
@@ -24,8 +41,17 @@ jobs:
         run: meson dist -C builddir/ --no-tests
       - name: Create release note
         run: tools/extract_release_note.py NEWS ${{ github.workspace }}-release-note.txt
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-files
+          path: |
+            builddir/meson-dist/*
+            ${{ github.workspace }}-release-note.txt
       - name: Release
         uses: softprops/action-gh-release@v1
+        # only actually create the release when run on tag
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: builddir/meson-dist/*
           body_path: ${{ github.workspace }}-release-note.txt
