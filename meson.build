@@ -37,6 +37,7 @@ sysconfdir = get_option('sysconfdir') / meson.project_name()
 libexecdir = get_option('libexecdir') / meson.project_name()
 mandir = get_option('mandir')
 moduledir = get_option('libdir') / meson.project_name()
+systemddir = get_option('libdir') / 'systemd'
 
 #
 # Required dependencies
@@ -149,6 +150,7 @@ summary({
   'sysconfdir': sysconfdir,
   'moduledir': moduledir,
   'mandir': mandir,
+  'systemddir': systemddir,
 }, section: 'Directories')
 summary({
   'extra_debug': get_option('extra_debug'),
@@ -180,8 +182,14 @@ foreach filename, kwargs : {
     'install_dir': bindir,
     'install_mode': 'rwxr-xr-x',
   },
-  'docs/kmscon.service.in': {},
-  'docs/kmsconvt@.service.in': {},
+  'docs/kmscon.service.in': {
+    'install_dir': systemddir / 'system',
+    'install_mode': 'rw-r--r--',
+  },
+  'docs/kmsconvt@.service.in': {
+    'install_dir': systemddir / 'system',
+    'install_mode': 'rw-r--r--',
+  },
 }
   install_data(configure_file(input: filename, output: '@BASENAME@', configuration: dirs_info),
     kwargs: kwargs,
