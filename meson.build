@@ -37,7 +37,9 @@ sysconfdir = get_option('sysconfdir') / meson.project_name()
 libexecdir = get_option('libexecdir') / meson.project_name()
 mandir = get_option('mandir')
 moduledir = get_option('libdir') / meson.project_name()
-systemddir = get_option('libdir') / 'systemd'
+
+systemd_deps = dependency('systemd', required: false)
+systemdsystemunitdir = systemd_deps.get_variable('systemdsystemunitdir', default_value: get_option('libdir') / 'systemd/system')
 
 #
 # Required dependencies
@@ -150,7 +152,7 @@ summary({
   'sysconfdir': sysconfdir,
   'moduledir': moduledir,
   'mandir': mandir,
-  'systemddir': systemddir,
+  'systemdsystemunitdir': systemdsystemunitdir,
 }, section: 'Directories')
 summary({
   'extra_debug': get_option('extra_debug'),
@@ -183,11 +185,11 @@ foreach filename, kwargs : {
     'install_mode': 'rwxr-xr-x',
   },
   'docs/kmscon.service.in': {
-    'install_dir': systemddir / 'system',
+    'install_dir': systemdsystemunitdir,
     'install_mode': 'rw-r--r--',
   },
   'docs/kmsconvt@.service.in': {
-    'install_dir': systemddir / 'system',
+    'install_dir': systemdsystemunitdir,
     'install_mode': 'rw-r--r--',
   },
 }
