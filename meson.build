@@ -49,7 +49,6 @@ fs = import('fs')
 xkbcommon_deps = dependency('xkbcommon', version: '>=0.5.0')
 libtsm_deps = dependency('libtsm', version: '>=4.0.0')
 libudev_deps = dependency('libudev', version: '>=172')
-libdrm_deps = dependency('libdrm')
 dl_deps = dependency('dl')
 threads_deps = dependency('threads')
 
@@ -92,8 +91,8 @@ config = configuration_data()
 foreach name, reqs : {
   'multi_seat': [libsystemd_deps],
   'video_fbdev': [],
-  'video_drm2d': [],
-  'video_drm3d': [gbm_deps, egl_deps, glesv2_deps],
+  'video_drm2d': [libdrm_deps],
+  'video_drm3d': [libdrm_deps, gbm_deps, egl_deps, glesv2_deps],
   'renderer_bbulk': [],
   'renderer_gltex': [glesv2_deps],
   'renderer_pixman': [pixman_deps],
