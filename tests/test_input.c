@@ -244,11 +244,18 @@ int main(int argc, char **argv)
 	if (ret)
 		goto err_mon;
 
-	system("stty -echo");
+	ret = system("stty -echo");
+	if (ret)
+		goto err_signal;
+
 	uterm_monitor_scan(mon);
 	ev_eloop_run(eloop, -1);
-	system("stty echo");
 
+	ret = system("stty echo");
+	if (ret)
+		goto err_signal;
+
+err_signal:
 	ev_eloop_unregister_signal_cb(eloop, SIGQUIT, sig_quit, NULL);
 err_mon:
 	uterm_monitor_unref(mon);
