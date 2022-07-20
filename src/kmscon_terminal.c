@@ -624,6 +624,9 @@ int kmscon_terminal_register(struct kmscon_session **out,
 	if (ret)
 		goto err_con;
 
+	tsm_vte_set_backspace_sends_delete(term->vte,
+					   BUILD_BACKSPACE_SENDS_DELETE);
+
 	ret = tsm_vte_set_palette(term->vte, term->conf->palette);
 	if (ret)
 		goto err_vte;
