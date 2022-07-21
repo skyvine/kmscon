@@ -340,8 +340,13 @@ static void setup_child(int master, struct winsize *ws)
 		goto err_out;
 	}
 
-	/* erase character should be normal backspace */
-	attr.c_cc[VERASE] = 010;
+	if (BUILD_BACKSPACE_SENDS_DELETE) {
+		/* erase character should be delete */
+		attr.c_cc[VERASE] = 0177;
+	} else {
+		/* erase character should be normal backspace */
+		attr.c_cc[VERASE] = 010;
+	}
 
 	/* set changed terminal attributes */
 	if (tcsetattr(slave, TCSANOW, &attr) < 0) {
