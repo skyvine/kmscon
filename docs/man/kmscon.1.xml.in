@@ -207,6 +207,12 @@
                 is parsed as regular option by kmscon.
                 (default: /bin/login -p)</para>
 
+          <para>If this option is specified in the configuration file, the
+                argument is split into words using the rules of the POSIX shell.
+                It is possible to include whitespace in arguments by enclosing
+                the argument in double or single quotes or by prepending it with
+                a backslash.</para>
+
           <para>This example starts '/bin/bash -i' on each new terminal session:
                 ./kmscon --login --debug --no-switchvt -- /bin/bash -i</para>
         </listitem>
