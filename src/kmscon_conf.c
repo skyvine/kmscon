@@ -383,7 +383,7 @@ static int file_login(struct conf_option *opt, bool on, const char *arg)
 		return -EFAULT;
 	}
 
-	ret = shl_split_string(arg, &t, &size, ' ', false);
+	ret = shl_split_command_string(arg, &t, &size);
 	if (ret) {
 		log_error("cannot split 'login' config-option argument");
 		return ret;

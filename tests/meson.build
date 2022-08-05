@@ -17,5 +17,12 @@ foreach name, deps : {
   exe = executable(test_name, f'@test_name@.c',
     dependencies: deps,
   )
-  test(test_name, exe)
 endforeach
+
+test_shl = executable('test_shl', 'test_shl.c',
+  dependencies: [shl_deps, check_deps],
+)
+test('test_shl', test_shl,
+  protocol: 'tap',
+  env: {'CK_TAP_LOG_FILE_NAME': '-', 'CK_VERBOSITY': 'silent'},
+)

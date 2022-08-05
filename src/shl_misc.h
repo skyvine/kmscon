@@ -200,6 +200,219 @@ static inline int shl_split_string(const char *arg, char ***out,
 	return 0;
 }
 
+/* This parses \arg and splits the string into a new allocated array. The array
+ * is stored in \out and is NULL terminated. \out_num is the number of entries
+ * in the array. You can set it to NULL to not retrieve this value.  */
+static inline int shl_split_command_string(const char *arg, char ***out,
+					   unsigned int *out_num)
+{
+	unsigned int i;
+	unsigned int num, len, size, pos;
+	char **list, *off;
+	enum { UNQUOTED, DOUBLE_QUOTED, SINGLE_QUOTED } quote_status;
+	bool in_word;
+
+	if (!arg || !out)
+		return -EINVAL;
+
+	num = 0;
+	size = 0;
+	len = 0;
+	quote_status = UNQUOTED;
+	for (i = 0; arg[i]; ++i) {
+		switch (arg[i]) {
+		case ' ':
+		case '\t':
+			switch (quote_status) {
+			case UNQUOTED:
+				if (len > 0) {
+					++num;
+					size += len + 1;
+					len = 0;
+				}
+				break;
+			case DOUBLE_QUOTED:
+			case SINGLE_QUOTED:
+				++len;
+				break;
+			}
+			break;
+		case '"':
+			switch (quote_status) {
+			case UNQUOTED:
+				quote_status = DOUBLE_QUOTED;
+				break;
+			case DOUBLE_QUOTED:
+				quote_status = UNQUOTED;
+				break;
+			case SINGLE_QUOTED:
+				++len;
+				break;
+			}
+			break;
+		case '\'':
+			switch (quote_status) {
+			case UNQUOTED:
+				quote_status = SINGLE_QUOTED;
+				break;
+			case DOUBLE_QUOTED:
+				++len;
+				break;
+			case SINGLE_QUOTED:
+				quote_status = UNQUOTED;
+				break;
+			}
+			break;
+		case '\\':
+			switch (quote_status) {
+			case UNQUOTED:
+				if (!arg[i + 1])
+					return -EINVAL;
+				++i;
+				++len;
+				break;
+			case DOUBLE_QUOTED:
+				if (arg[i + 1] == '"' || arg[i + 1] == '\\')
+					++i;
+				++len;
+				break;
+			case SINGLE_QUOTED:
+				++len;
+				break;
+			}
+			break;
+		default:
+			++len;
+			break;
+		}
+	}
+
+	if (quote_status != UNQUOTED)
+		return -EINVAL;
+
+	if (len > 0) {
+		++num;
+		size += len + 1;
+	}
+
+	list = malloc(sizeof(char*) * (num + 1) + size);
+	if (!list)
+		return -ENOMEM;
+
+	off = (void*)(((char*)list) + (sizeof(char*) * (num + 1)));
+	len = 0;
+	pos = 0;
+	in_word = false;
+	for (i = 0; arg[i]; ++i) {
+		switch (arg[i]) {
+		case ' ':
+		case '\t':
+			switch (quote_status) {
+			case UNQUOTED:
+				if (in_word) {
+					in_word = false;
+					*off = '\0';
+					++off;
+				}
+				break;
+			case DOUBLE_QUOTED:
+			case SINGLE_QUOTED:
+				*off = arg[i];
+				if (!in_word) {
+					in_word = true;
+					list[pos++] = off;
+				}
+				++off;
+				break;
+			}
+			break;
+		case '"':
+			switch (quote_status) {
+			case UNQUOTED:
+				quote_status = DOUBLE_QUOTED;
+				break;
+			case DOUBLE_QUOTED:
+				quote_status = UNQUOTED;
+				break;
+			case SINGLE_QUOTED:
+				*off = arg[i];
+				if (!in_word) {
+					in_word = true;
+					list[pos++] = off;
+				}
+				++off;
+				break;
+			}
+			break;
+		case '\'':
+			switch (quote_status) {
+			case UNQUOTED:
+				quote_status = SINGLE_QUOTED;
+				break;
+			case DOUBLE_QUOTED:
+				*off = arg[i];
+				if (!in_word) {
+					in_word = true;
+					list[pos++] = off;
+				}
+				++off;
+				break;
+			case SINGLE_QUOTED:
+				quote_status = UNQUOTED;
+				break;
+			}
+			break;
+		case '\\':
+			switch (quote_status) {
+			case UNQUOTED:
+				++i;
+				*off = arg[i];
+				if (!in_word) {
+					in_word = true;
+					list[pos++] = off;
+				}
+				++off;
+				break;
+			case DOUBLE_QUOTED:
+				if (arg[i + 1] == '"' || arg[i + 1] == '\\')
+					++i;
+				*off = arg[i];
+				if (!in_word) {
+					in_word = true;
+					list[pos++] = off;
+				}
+				++off;
+				break;
+			case SINGLE_QUOTED:
+				*off = arg[i];
+				if (!in_word) {
+					in_word = true;
+					list[pos++] = off;
+				}
+				++off;
+				break;
+			}
+			break;
+		default:
+			*off = arg[i];
+			if (!in_word) {
+				in_word = true;
+				list[pos++] = off;
+			}
+			++off;
+			break;
+		}
+	}
+	if (in_word)
+		*off = '\0';
+	list[pos] = NULL;
+
+	*out = list;
+	if (out_num)
+		*out_num = num;
+	return 0;
+}
+
 static inline int shl_dup_array_size(char ***out, char **argv, size_t len)
 {
 	char **t, *off;

@@ -73,6 +73,7 @@ glesv2_deps = dependency('glesv2', disabler: true, required: require_glesv2)
 pango_deps = dependency('pangoft2', disabler: true, required: get_option('font_pango'))
 pixman_deps = dependency('pixman-1', disabler: true, required: get_option('renderer_pixman'))
 xsltproc = find_program('xsltproc', native: true, disabler: true, required: get_option('docs'))
+check_deps = dependency('check', disabler: true, required: get_option('tests'))
 
 #
 # Handle feature options
