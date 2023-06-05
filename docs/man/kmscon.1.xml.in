@@ -482,6 +482,27 @@
                 only be used to debug render engines. (default: off)</para>
         </listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term><option>--desired-width {pixels}</option></term>
+        <term><option>--desired-height {pixels}</option></term>
+        <listitem>
+          <para>Set the desired width and height of the output. The given width
+          and height must match a supported more exactly for this option to have
+          any effect; if there is no supported mode that matches exactly, or if there is
+          an error when using the desired mode, then the default mode (first valid mode
+          found) will be used.</para>
+
+          <para>Modesetting is only supported in DRM mode, so these options do
+          nothing with fbdev. However, fbset can still be used to externally set
+          the mode when fbdev is in use.</para>
+
+          <para>Other system components may need configuration in order to use the desired
+          mode effectively. For example, the `video={width}x{height}` kernel parameter may
+          be required in order to ensure that there is enough memory to store the
+          framebuffers for a large resolution.</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
 
     <para>Font Options:</para>

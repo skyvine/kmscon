@@ -145,6 +145,9 @@ struct kmscon_conf_t {
 	unsigned int gpus;
 	/* render engine */
 	char *render_engine;
+	/* screen resolution */
+	unsigned int desired_width;
+	unsigned int desired_height;
 
 	/* Font Options */
 	/* font engine */

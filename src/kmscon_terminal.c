@@ -114,6 +114,8 @@ static void do_clear_margins(struct screen *scr)
 				   sw, dh);
 }
 
+static int font_set(struct kmscon_terminal *term);
+
 static void do_redraw_screen(struct screen *scr)
 {
 	int ret;
@@ -129,6 +131,14 @@ static void do_redraw_screen(struct screen *scr)
 	kmscon_text_render(scr->txt);
 
 	ret = uterm_display_swap(scr->disp, false);
+
+	if (ret == -EAGAIN) {
+		uterm_display_deactivate(scr->disp);
+		uterm_display_activate(scr->disp, NULL);
+		font_set(scr->term);
+		ret = uterm_display_swap(scr->disp, false);
+	}
+
 	if (ret) {
 		log_warning("cannot swap display %p", scr->disp);
 		return;

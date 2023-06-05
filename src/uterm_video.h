@@ -192,7 +192,8 @@ int uterm_display_fake_blendv(struct uterm_display *disp,
 /* video interface */
 
 int uterm_video_new(struct uterm_video **out, struct ev_eloop *eloop,
-		    const char *node, const struct uterm_video_module *mod);
+		    const char *node, const struct uterm_video_module *mod,
+		    unsigned int desired_width, unsigned int desired_height);
 void uterm_video_ref(struct uterm_video *video);
 void uterm_video_unref(struct uterm_video *video);
 

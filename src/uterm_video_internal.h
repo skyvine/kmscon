@@ -118,6 +118,7 @@ struct uterm_display {
 	struct shl_hook *hook;
 	struct shl_dlist modes;
 	struct uterm_mode *default_mode;
+	struct uterm_mode *desired_mode;
 	struct uterm_mode *current_mode;
 	int dpms;
 
@@ -158,6 +159,9 @@ struct uterm_video {
 
 	struct shl_dlist displays;
 	struct shl_hook *hook;
+
+	unsigned int desired_width;
+	unsigned int desired_height;
 
 	const struct uterm_video_module *mod;
 	const struct video_ops *ops;

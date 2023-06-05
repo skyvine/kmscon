@@ -410,7 +410,7 @@ int uterm_display_activate(struct uterm_display *disp, struct uterm_mode *mode)
 		return -EINVAL;
 
 	if (!mode)
-		mode = disp->default_mode;
+		mode = disp->desired_mode;
 
 	return VIDEO_CALL(disp->ops->activate, 0, disp, mode);
 }
@@ -544,7 +544,8 @@ int uterm_display_fake_blendv(struct uterm_display *disp,
 
 SHL_EXPORT
 int uterm_video_new(struct uterm_video **out, struct ev_eloop *eloop,
-		    const char *node, const struct uterm_video_module *mod)
+		    const char *node, const struct uterm_video_module *mod,
+		    unsigned int desired_width, unsigned int desired_height)
 {
 	struct uterm_video *video;
 	int ret;
@@ -571,6 +572,9 @@ int uterm_video_new(struct uterm_video **out, struct ev_eloop *eloop,
 	ret = VIDEO_CALL(video->ops->init, 0, video, node);
 	if (ret)
 		goto err_hook;
+
+	video->desired_width = desired_width;
+	video->desired_height = desired_height;
 
 	ev_eloop_ref(video->eloop);
 	log_info("new device %p", video);

@@ -362,6 +362,11 @@ int uterm_drm_display_swap(struct uterm_display *disp, uint32_t fb,
 		ret = drmModePageFlip(vdrm->fd, ddrm->crtc_id, fb,
 				      DRM_MODE_PAGE_FLIP_EVENT, disp);
 		if (ret) {
+			if (disp->desired_mode != disp->default_mode) {
+				disp->desired_mode = disp->default_mode;
+				log_debug("Unable to page-flip desired mode! Switching to default mode.");
+				return -EAGAIN;
+			}
 			log_error("cannot page-flip on DRM-CRTC (%d): %m",
 				  errno);
 			return -EFAULT;
@@ -616,8 +621,26 @@ static void bind_display(struct uterm_video *video, drmModeRes *res,
 		if (!disp->default_mode)
 			disp->default_mode = mode;
 
+		if (video->desired_width != 0 &&
+		    video->desired_height != 0 &&
+		    mode->ops->get_width(mode) == video->desired_width &&
+		    mode->ops->get_height(mode) == video->desired_height)
+			disp->desired_mode = mode;
+
 		uterm_mode_unref(mode);
 	}
+
+	if (!disp->desired_mode) {
+		disp->desired_mode = disp->default_mode;
+	}
+
+	log_debug("Default mode %dx%d",
+		  disp->default_mode->ops->get_width(disp->default_mode),
+		  disp->default_mode->ops->get_height(disp->default_mode));
+
+	log_debug("Desired mode %dx%d",
+		  disp->desired_mode->ops->get_width(disp->desired_mode),
+		  disp->desired_mode->ops->get_height(disp->desired_mode));
 
 	if (shl_dlist_empty(&disp->modes)) {
 		log_warn("no valid mode for display found");

@@ -136,12 +136,19 @@ static void print_help()
 		"\t                                  Create new terminal session\n"
 		"\n"
 		"Video Options:\n"
-		"\t    --drm                   [on]    Use DRM if available\n"
-		"\t    --hwaccel               [off]   Use 3D hardware-acceleration if\n"
-		"\t                                    available\n"
-		"\t    --gpus={all,aux,primary}[all]   GPU selection mode\n"
-		"\t    --render-engine <eng>   [-]     Console renderer\n"
-		"\t    --render-timing         [off]   Print renderer timing information\n"
+		"\t    --drm                     [on]    Use DRM if available\n"
+		"\t    --hwaccel                 [off]   Use 3D hardware-acceleration if\n"
+		"\t                                      available\n"
+		"\t    --gpus={all,aux,primary}  [all]   GPU selection mode\n"
+		"\t    --render-engine <eng>     [-]     Console renderer\n"
+		"\t    --render-timing           [off]   Print renderer timing information\n"
+		"\t    --desired-width <pixels>  [0]\n"
+		"\t    --desired-height <pixels> [0]     Set the desired width/height of\n"
+		"\t                                      the output. If the desired mode\n"
+		"\t                                      is not available or encounters an\n"
+		"\t                                      error, a default mode will be\n"
+		"\t                                      used. See the man page for\n"
+		"\t                                      additional details.\n"
 		"\n"
 		"Font Options:\n"
 		"\t    --font-engine <engine>  [pango]\n"
@@ -734,6 +741,8 @@ int kmscon_conf_new(struct conf_ctx **out)
 		CONF_OPTION_BOOL(0, "hwaccel", &conf->hwaccel, false),
 		CONF_OPTION(0, 0, "gpus", &conf_gpus, NULL, NULL, NULL, &conf->gpus, KMSCON_GPU_ALL),
 		CONF_OPTION_STRING(0, "render-engine", &conf->render_engine, NULL),
+		CONF_OPTION_UINT(0, "desired-width", &conf->desired_width, 0),
+		CONF_OPTION_UINT(0, "desired-height", &conf->desired_height, 0),
 
 		/* Font Options */
 		CONF_OPTION_STRING(0, "font-engine", &conf->font_engine, "pango"),
