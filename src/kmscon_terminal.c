@@ -134,9 +134,11 @@ static void do_redraw_screen(struct screen *scr)
 
 	if (ret == -EAGAIN) {
 		uterm_display_deactivate(scr->disp);
-		uterm_display_activate(scr->disp, NULL);
-		font_set(scr->term);
-		ret = uterm_display_swap(scr->disp, false);
+		ret = uterm_display_activate(scr->disp, NULL);
+		if (!ret)
+			ret = font_set(scr->term);
+		if (!ret)
+			ret = uterm_display_swap(scr->disp, false);
 	}
 
 	if (ret) {

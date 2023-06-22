@@ -190,7 +190,12 @@ static int display_activate(struct uterm_display *disp, struct uterm_mode *mode)
 	ret = drmModeSetCrtc(vdrm->fd, ddrm->crtc_id,
 			     d2d->rb[0].fb, 0, 0, &ddrm->conn_id, 1,
 			     minfo);
-	if (ret) {
+
+	if (ret && mode == disp->desired_mode && mode != disp->default_mode) {
+		mode = disp->desired_mode = disp->default_mode;
+		ret = -EAGAIN;
+		goto err_fb;
+	} else if (ret) {
 		log_err("cannot set drm-crtc");
 		ret = -EFAULT;
 		goto err_fb;

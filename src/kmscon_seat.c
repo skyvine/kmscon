@@ -159,6 +159,8 @@ static void activate_display(struct kmscon_display *d)
 	 * files. */
 	if (uterm_display_get_state(d->disp) == UTERM_DISPLAY_INACTIVE) {
 		ret = uterm_display_activate(d->disp, NULL);
+		if (ret == -EAGAIN)
+			ret = uterm_display_activate(d->disp, NULL);
 		if (ret)
 			return;
 
